@@ -3,12 +3,12 @@ import random
 
 class Restaurant:
     def __init__(self, num_tables):
-        self.tables = asyncio.Semaphore(num_tables)  # ใช้ semaphore เพื่อควบคุมจำนวนโต๊ะ
-        self.waiting_customers = asyncio.Queue()  # ใช้ queue เพื่อจัดการลูกค้าที่รอ
+        self.tables = asyncio.Semaphore(num_tables)  
+        self.waiting_customers = asyncio.Queue()  
 
     async def seat_customer(self, customer_id):
         """จัดที่นั่งให้ลูกค้า"""
-        await self.tables.acquire()  # รอให้โต๊ะว่าง
+        await self.tables.acquire()  
         print(f"🪑 ลูกค้า {customer_id} ได้โต๊ะ")
         await self.take_order(customer_id)
 
@@ -34,23 +34,23 @@ class Restaurant:
         """ลูกค้ากินเสร็จและออกจากร้าน"""
         await asyncio.sleep(random.uniform(2, 4))
         print(f"💰 ลูกค้า {customer_id} จ่ายเงินและออกจากร้าน")
-        self.tables.release()  # คืนโต๊ะให้สามารถใช้ได้
-        await self.waiting_customers.get()  # เอาลูกค้าออกจาก queue
-        self.waiting_customers.task_done()  # แจ้งว่าเสร็จสิ้นการทำงานของลูกค้าคนนี้
+        self.tables.release()  
+        await self.waiting_customers.get()  
+        self.waiting_customers.task_done()  
 
 async def customer_task(customer_id, restaurant):
     """จำลองลูกค้าที่เข้ามาในร้าน"""
     print(f"🚶‍♂ ลูกค้า {customer_id} เข้าร้าน")
-    await restaurant.waiting_customers.put(customer_id)  # เพิ่มลูกค้าลงใน queue
+    await restaurant.waiting_customers.put(customer_id)  
     await restaurant.seat_customer(customer_id)
 
 async def main():
-    num_tables = 3  # จำนวนโต๊ะ
+    num_tables = 3  
     restaurant = Restaurant(num_tables)
-    customers = [customer_task(i, restaurant) for i in range(1, 8)]  # มีลูกค้า 7 คน
+    customers = [customer_task(i, restaurant) for i in range(1, 8)]  
     
-    await asyncio.gather(*customers)  # รันทุก task ของลูกค้า
-    await restaurant.waiting_customers.join()  # รอจนกว่าทุกลูกค้าจะเสร็จสิ้น
+    await asyncio.gather(*customers)  
+    await restaurant.waiting_customers.join()  
 
 if __name__ == "__main__":
     asyncio.run(main())
