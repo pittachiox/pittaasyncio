@@ -8,11 +8,7 @@ class Restaurant:
 
     
 
-async def customer_task(customer_id, restaurant):
-    """จำลองลูกค้าที่เข้ามาในร้าน"""
-    print(f"🚶‍♂ ลูกค้า {customer_id} เข้าร้าน")
-    await restaurant.waiting_customers.put(customer_id)
-    await restaurant.seat_customer(customer_id)
+
 
 async def main():
     num_tables = 3  # จำนวนโต๊ะในร้าน
